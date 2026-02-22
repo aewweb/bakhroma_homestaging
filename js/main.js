@@ -1,9 +1,3 @@
-/*
-	Verti by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
-
 (function($) {
 
 	var	$window = $(window),
@@ -62,3 +56,91 @@
 				});
 
 })(jQuery);
+
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const carousel = document.getElementById('carousel');
+	const cards = document.querySelectorAll('.case-card');
+	const prevBtn = document.getElementById('prevCase');
+	const next = document.getElementById('nextCase');
+	const dotsContainer = document.getElementById('carouselDots');
+	
+	let currentIndex = 0;
+	let visibleCards = window.innerWidth < 768 ? 1 : 3;
+	
+	function getMaxIndex() {
+	  return Math.max(0, cards.length - visibleCards);
+	}
+	
+	function updateCarousel() {
+	  const cardWidth = cards[0].offsetWidth + 20; // card + gap
+	  carousel.scrollTo({
+		left: currentIndex * cardWidth,
+		behavior: 'smooth'
+	  });
+	  updateDots();
+	}
+	
+	function updateDots() {
+	  dotsContainer.innerHTML = '';
+	  const totalSteps = getMaxIndex() + 1;
+	  for (let i = 0; i < totalSteps; i++) {
+		const dot = document.createElement('div');
+		dot.classList.add('dot');
+		if (i === currentIndex) dot.classList.add('active');
+	
+		// 👇 Добавляем обработчик клика на точку
+		dot.addEventListener('click', () => {
+		  currentIndex = i;
+		  updateCarousel();
+		});
+	
+		dotsContainer.appendChild(dot);
+	  }
+	}
+	
+	// 👈 Зацикливание влево
+	prevBtn.addEventListener('click', () => {
+	  currentIndex = currentIndex > 0 ? currentIndex - 1 : getMaxIndex();
+	  updateCarousel();
+	});
+	
+	// 👉 Зацикливание вправо
+	next.addEventListener('click', () => {
+	  currentIndex = currentIndex < getMaxIndex() ? currentIndex + 1 : 0;
+	  updateCarousel();
+	});
+	
+	// 📱 Адаптация при ресайзе
+	window.addEventListener('resize', () => {
+	  visibleCards = window.innerWidth < 768 ? 1 : 3;
+	  currentIndex = 0;
+	  updateCarousel();
+	});
+	
+	// 📱 Свайп на мобильных
+	let startX = 0;
+	let endX = 0;
+	
+	carousel.addEventListener('touchstart', (e) => {
+	  startX = e.touches[0].clientX;
+	});
+	
+	carousel.addEventListener('touchmove', (e) => {
+	  endX = e.touches[0].clientX;
+	});
+	
+	carousel.addEventListener('touchend', () => {
+	  const delta = endX - startX;
+	  if (Math.abs(delta) > 50) {
+		if (delta < 0) {
+		  currentIndex = currentIndex < getMaxIndex() ? currentIndex + 1 : 0;
+		} else {
+		  currentIndex = currentIndex > 0 ? currentIndex - 1 : getMaxIndex();
+		}
+		updateCarousel();
+	  }
+	});
+	
+	updateCarousel();	
+});
