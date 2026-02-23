@@ -143,4 +143,90 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 	
 	updateCarousel();	
+
+
+	const carouselImg = document.getElementById('carouselImg');
+	const cardsImg = document.querySelectorAll('.case-card-img');
+	const prevBtnImg = document.getElementById('prevCaseImg');
+	const nextImg = document.getElementById('nextCaseImg');
+	const dotsContainerImg = document.getElementById('carouselDotsImg');
+	
+	let currentIndexImg = 0;
+	let visibleCardsImg = window.innerWidth < 768 ? 1 : 3;
+	
+	function getMaxIndexImg() {
+	  return Math.max(0, cardsImg.length - visibleCardsImg);
+	}
+	
+	function updateCarouselImg() {
+	  const cardWidth = cardsImg[0].offsetWidth + 20; // card + gap
+	  carouselImg.scrollTo({
+		left: currentIndexImg * cardWidth,
+		behavior: 'smooth'
+	  });
+	  updateDotsImg();
+	}
+	
+	function updateDotsImg() {
+	  dotsContainerImg.innerHTML = '';
+	  const totalSteps = getMaxIndexImg() + 1;
+	  for (let i = 0; i < totalSteps; i++) {
+		const dot = document.createElement('div');
+		dot.classList.add('dot');
+		if (i === currentIndexImg) dot.classList.add('active');
+	
+		// 👇 Добавляем обработчик клика на точку
+		dot.addEventListener('click', () => {
+		  currentIndexImg = i;
+		  updateCarouselImg();
+		});
+	
+		dotsContainerImg.appendChild(dot);
+	  }
+	}
+	
+	// 👈 Зацикливание влево
+	prevBtnImg.addEventListener('click', () => {
+	  currentIndexImg = currentIndexImg > 0 ? currentIndexImg - 1 : getMaxIndexImg();
+	  updateCarouselImg();
+	});
+	
+	// 👉 Зацикливание вправо
+	nextImg.addEventListener('click', () => {
+	  currentIndexImg = currentIndexImg < getMaxIndexImg() ? currentIndexImg + 1 : 0;
+	  updateCarouselImg();
+	});
+	
+	// 📱 Адаптация при ресайзе
+	window.addEventListener('resize', () => {
+	  visibleCardsImg = window.innerWidth < 768 ? 1 : 3;
+	  currentIndexImg = 0;
+	  updateCarouselImg();
+	});
+	
+	// 📱 Свайп на мобильных
+	let startXImg = 0;
+	let endXImg = 0;
+	
+	carouselImg.addEventListener('touchstart', (e) => {
+	  startXImg = e.touches[0].clientX;
+	});
+	
+	carouselImg.addEventListener('touchmove', (e) => {
+	  endXImg = e.touches[0].clientX;
+	});
+	
+	carouselImg.addEventListener('touchend', () => {
+	  const deltaImg = endXImg - startXImg;
+	  if (Math.abs(deltaImg) > 50) {
+		if (deltaImg < 0) {
+		  currentIndexImg = currentIndexImg < getMaxIndexImg() ? currentIndexImg + 1 : 0;
+		} else {
+		  currentIndexImg = currentIndexImg > 0 ? currentIndexImg - 1 : getMaxIndexImg();
+		}
+		updateCarouselImg();
+	  }
+	});
+	
+	updateCarouselImg();	
 });
