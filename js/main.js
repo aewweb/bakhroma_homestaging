@@ -58,6 +58,13 @@
 })(jQuery);
 
 document.addEventListener("DOMContentLoaded", () => {
+
+	document.querySelectorAll('.faq-question').forEach(button => {
+		button.addEventListener('click', () => {
+		  const item = button.closest('.faq-item');
+		  item.classList.toggle('active');
+		});
+	  });
 	
 	const carousel = document.getElementById('carousel');
 	const cards = document.querySelectorAll('.case-card');
