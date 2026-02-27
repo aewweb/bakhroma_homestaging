@@ -71,16 +71,16 @@ document.addEventListener("DOMContentLoaded", () => {
     case1: {
       title: "КЕЙС: ЗАГОРОДНЫЙ ДОМ",
       beforeImages: [
-        "./images/case1_before1.webp",
-        "./images/case1_before2.webp",
-        "./images/case1_before3.webp",
-        "./images/case1_before4.webp"
+        "/images/case1_before1.webp",
+        "/images/case1_before2.webp",
+        "/images/case1_before3.webp",
+        "/images/case1_before4.webp"
       ],
       afterImages: [
-        "./images/case1_after1.webp",
-        "./images/case1_after2.webp",
-        "./images/case1_after3.webp",
-        "./images/case1_after4.webp"
+        "/images/case1_after1.webp",
+        "/images/case1_after2.webp",
+        "/images/case1_after3.webp",
+        "/images/case1_after4.webp"
       ],
       beforeText: `
       Исходные данные: 
