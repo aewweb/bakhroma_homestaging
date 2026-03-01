@@ -66,174 +66,121 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	  });
 	
-	const carousel = document.getElementById('carousel');
-	const cards = document.querySelectorAll('.case-card');
-	const prevBtn = document.getElementById('prevCase');
-	const next = document.getElementById('nextCase');
-	const dotsContainer = document.getElementById('carouselDots');
-	
-	let currentIndex = 0;
-	let visibleCards = window.innerWidth < 768 ? 1 : 3;
-	
-	function getMaxIndex() {
-	  return Math.max(0, cards.length - visibleCards);
-	}
-	
-	function updateCarousel() {
-	  const cardWidth = cards[0].offsetWidth + 20; // card + gap
-	  carousel.scrollTo({
-		left: currentIndex * cardWidth,
-		behavior: 'smooth'
-	  });
-	  updateDots();
-	}
-	
-	function updateDots() {
-	  dotsContainer.innerHTML = '';
-	  const totalSteps = getMaxIndex() + 1;
-	  for (let i = 0; i < totalSteps; i++) {
-		const dot = document.createElement('div');
-		dot.classList.add('dot');
-		if (i === currentIndex) dot.classList.add('active');
-	
-		// 👇 Добавляем обработчик клика на точку
-		dot.addEventListener('click', () => {
-		  currentIndex = i;
-		  updateCarousel();
-		});
-	
-		dotsContainer.appendChild(dot);
-	  }
-	}
-	
-	// 👈 Зацикливание влево
-	prevBtn.addEventListener('click', () => {
-	  currentIndex = currentIndex > 0 ? currentIndex - 1 : getMaxIndex();
-	  updateCarousel();
-	});
-	
-	// 👉 Зацикливание вправо
-	next.addEventListener('click', () => {
-	  currentIndex = currentIndex < getMaxIndex() ? currentIndex + 1 : 0;
-	  updateCarousel();
-	});
-	
-	// 📱 Адаптация при ресайзе
-	window.addEventListener('resize', () => {
-	  visibleCards = window.innerWidth < 768 ? 1 : 3;
-	  currentIndex = 0;
-	  updateCarousel();
-	});
-	
-	// 📱 Свайп на мобильных
-	let startX = 0;
-	let endX = 0;
-	
-	carousel.addEventListener('touchstart', (e) => {
-	  startX = e.touches[0].clientX;
-	});
-	
-	carousel.addEventListener('touchmove', (e) => {
-	  endX = e.touches[0].clientX;
-	});
-	
-	carousel.addEventListener('touchend', () => {
-	  const delta = endX - startX;
-	  if (Math.abs(delta) > 50) {
-		if (delta < 0) {
-		  currentIndex = currentIndex < getMaxIndex() ? currentIndex + 1 : 0;
-		} else {
-		  currentIndex = currentIndex > 0 ? currentIndex - 1 : getMaxIndex();
+		function initCarousel({
+		  carouselId,
+		  cardSelector,
+		  prevBtnId,
+		  nextBtnId,
+		  dotsId
+		}) {
+		  const carousel = document.getElementById(carouselId);
+		  const cards = Array.from(document.querySelectorAll(cardSelector));
+		  const prevBtn = document.getElementById(prevBtnId);
+		  const nextBtn = document.getElementById(nextBtnId);
+		  const dotsContainer = document.getElementById(dotsId);
+	  
+		  if (!carousel || cards.length === 0) return;
+	  
+		  let currentIndex = 0;
+		  let visibleCards = window.innerWidth < 768 ? 1 : 3;
+		  let cardWidth = 0;
+	  
+		  /* ===== РАСЧЁТ ===== */
+		  function updateSizes() {
+			visibleCards = window.innerWidth < 768 ? 1 : 3;
+			cardWidth = cards[0].offsetWidth + 20; // gap = 20px
+		  }
+	  
+		  function getMaxIndex() {
+			return Math.max(0, cards.length - visibleCards);
+		  }
+	  
+		  /* ===== ПЕРЕХОД ===== */
+		  function goTo(index, smooth = true) {
+			const max = getMaxIndex();
+	  
+			if (index < 0) index = max;
+			if (index > max) index = 0;
+	  
+			currentIndex = index;
+	  
+			carousel.scrollTo({
+			  left: currentIndex * cardWidth,
+			  behavior: smooth ? 'smooth' : 'auto'
+			});
+	  
+			updateDots();
+		  }
+	  
+		  /* ===== ТОЧКИ ===== */
+		  function updateDots() {
+			dotsContainer.innerHTML = '';
+			const total = getMaxIndex() + 1;
+	  
+			for (let i = 0; i < total; i++) {
+			  const dot = document.createElement('div');
+			  dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+	  
+			  dot.addEventListener('click', () => goTo(i));
+			  dotsContainer.appendChild(dot);
+			}
+		  }
+	  
+		  /* ===== КНОПКИ ===== */
+		  prevBtn?.addEventListener('click', () => goTo(currentIndex - 1));
+		  nextBtn?.addEventListener('click', () => goTo(currentIndex + 1));
+	  
+		  /* ===== СВАЙП ===== */
+		  let startX = 0;
+	  
+		  carousel.addEventListener('touchstart', e => {
+			startX = e.touches[0].clientX;
+		  }, { passive: true });
+	  
+		  carousel.addEventListener('touchend', e => {
+			const delta = e.changedTouches[0].clientX - startX;
+			if (Math.abs(delta) > 50) {
+			  delta < 0 ? goTo(currentIndex + 1) : goTo(currentIndex - 1);
+			}
+		  });
+	  
+		  /* ===== СИНХРОНИЗАЦИЯ ===== */
+		  carousel.addEventListener('scroll', () => {
+			const index = Math.round(carousel.scrollLeft / cardWidth);
+			if (index !== currentIndex) {
+			  currentIndex = index;
+			  updateDots();
+			}
+		  });
+	  
+		  /* ===== RESIZE ===== */
+		  window.addEventListener('resize', () => {
+			updateSizes();
+			goTo(0, false);
+		  });
+	  
+		  /* ===== INIT ===== */
+		  updateSizes();
+		  goTo(0, false);
 		}
-		updateCarousel();
-	  }
-	});
-	
-	updateCarousel();	
-
-
-	const carouselImg = document.getElementById('carouselImg');
-	const cardsImg = document.querySelectorAll('.case-card-img');
-	const prevBtnImg = document.getElementById('prevCaseImg');
-	const nextImg = document.getElementById('nextCaseImg');
-	const dotsContainerImg = document.getElementById('carouselDotsImg');
-	
-	let currentIndexImg = 0;
-	let visibleCardsImg = window.innerWidth < 768 ? 1 : 3;
-	
-	function getMaxIndexImg() {
-	  return Math.max(0, cardsImg.length - visibleCardsImg);
-	}
-	
-	function updateCarouselImg() {
-	  const cardWidth = cardsImg[0].offsetWidth + 20; // card + gap
-	  carouselImg.scrollTo({
-		left: currentIndexImg * cardWidth,
-		behavior: 'smooth'
-	  });
-	  updateDotsImg();
-	}
-	
-	function updateDotsImg() {
-	  dotsContainerImg.innerHTML = '';
-	  const totalSteps = getMaxIndexImg() + 1;
-	  for (let i = 0; i < totalSteps; i++) {
-		const dot = document.createElement('div');
-		dot.classList.add('dot');
-		if (i === currentIndexImg) dot.classList.add('active');
-	
-		// 👇 Добавляем обработчик клика на точку
-		dot.addEventListener('click', () => {
-		  currentIndexImg = i;
-		  updateCarouselImg();
+	  
+		/* =========================
+		   ИНИЦИАЛИЗАЦИЯ КАРУСЕЛЕЙ
+		========================= */
+	  
+		initCarousel({
+		  carouselId: 'carousel',
+		  cardSelector: '.case-card',
+		  prevBtnId: 'prevCase',
+		  nextBtnId: 'nextCase',
+		  dotsId: 'carouselDots'
 		});
-	
-		dotsContainerImg.appendChild(dot);
-	  }
-	}
-	
-	// 👈 Зацикливание влево
-	prevBtnImg.addEventListener('click', () => {
-	  currentIndexImg = currentIndexImg > 0 ? currentIndexImg - 1 : getMaxIndexImg();
-	  updateCarouselImg();
-	});
-	
-	// 👉 Зацикливание вправо
-	nextImg.addEventListener('click', () => {
-	  currentIndexImg = currentIndexImg < getMaxIndexImg() ? currentIndexImg + 1 : 0;
-	  updateCarouselImg();
-	});
-	
-	// 📱 Адаптация при ресайзе
-	window.addEventListener('resize', () => {
-	  visibleCardsImg = window.innerWidth < 768 ? 1 : 3;
-	  currentIndexImg = 0;
-	  updateCarouselImg();
-	});
-	
-	// 📱 Свайп на мобильных
-	let startXImg = 0;
-	let endXImg = 0;
-	
-	carouselImg.addEventListener('touchstart', (e) => {
-	  startXImg = e.touches[0].clientX;
-	});
-	
-	carouselImg.addEventListener('touchmove', (e) => {
-	  endXImg = e.touches[0].clientX;
-	});
-	
-	carouselImg.addEventListener('touchend', () => {
-	  const deltaImg = endXImg - startXImg;
-	  if (Math.abs(deltaImg) > 50) {
-		if (deltaImg < 0) {
-		  currentIndexImg = currentIndexImg < getMaxIndexImg() ? currentIndexImg + 1 : 0;
-		} else {
-		  currentIndexImg = currentIndexImg > 0 ? currentIndexImg - 1 : getMaxIndexImg();
-		}
-		updateCarouselImg();
-	  }
-	});
-	
-	updateCarouselImg();	
+	  
+		initCarousel({
+		  carouselId: 'carouselImg',
+		  cardSelector: '.case-card-img',
+		  prevBtnId: 'prevCaseImg',
+		  nextBtnId: 'nextCaseImg',
+		  dotsId: 'carouselDotsImg'
+		});	  
 });
