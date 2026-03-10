@@ -1,9 +1,16 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
-  base: './',          // ОБЯЗАТЕЛЬНО для GitHub Pages
+  base: './',
   build: {
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        cases: resolve(__dirname, 'cases.html'),
+      }
+    }
   }
 })
