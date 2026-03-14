@@ -3592,15 +3592,15 @@ input, select, textarea {
 			  }
 			  
 			  .pinterest img {
-				height: 100px !important;
+				height: 80px !important;
 			  }
 			  
 			  .telegram img {
-				height: 100px !important;
+				height: 80px !important;
 			  }
 			  
 			  .whatsapp img {
-				height: 100px !important;
+				height: 80px !important;
 			  }
 			
 			/* ======================
@@ -3639,15 +3639,15 @@ input, select, textarea {
 				  }
 				
 				  .pinterest img {
-					height: 55px !important;
+					height: 45px !important;
 				  }
 				
 				  .telegram img {
-					height: 55px !important;
+					height: 45px !important;
 				  }
 				
 				  .whatsapp img {
-					height: 55px !important;
+					height: 45px !important;
 				  }
 			}
 
@@ -4151,7 +4151,7 @@ input, select, textarea {
   
   /* сама иконка */
   .social-btn img {
-	height: 40px;   /* фиксированная высота */
+	height: 35px;   /* фиксированная высота */
 	width: auto;    /* ширина автоматически */
 	display: block;
 	transition: transform 0.2s ease;
